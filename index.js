@@ -1,5 +1,6 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { google } = require('googleapis');
+const http = require('http');
 
 const DAY_REACTIONS = {
   '4️⃣': 4,
@@ -639,5 +640,14 @@ if (!token) {
   console.error('❌ ERROR: DISCORD_TOKEN is not set. Please set the DISCORD_TOKEN environment variable.');
   process.exit(1);
 }
+
+// Start HTTP server for Render health checks
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ status: 'VoteBot is running!' }));
+}).listen(PORT, () => {
+  console.log(`✅ HTTP server listening on port ${PORT}`);
+});
 
 client.login(token);
