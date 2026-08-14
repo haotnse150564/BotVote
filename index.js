@@ -53,15 +53,34 @@ async function getGoogleAuthClient() {
     // Railway: Try base64 encoded credentials first
     if (process.env.GOOGLE_SERVICE_ACCOUNT_BASE64) {
       console.log('Using base64 encoded credentials (Railway mode)');
-      const buffer = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_BASE64, 'base64');
-      const credentials = JSON.parse(buffer.toString());
-      
-      auth = new google.auth.GoogleAuth({
-        credentials,
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      });
+      try {
+        const buffer = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_BASE64, 'base64');
+        const decodedString = buffer.toString('utf-8');
+        console.log('Decoded length:', decodedString.length);
+        const credentials = JSON.parse(decodedString);
+        
+        auth = new google.auth.GoogleAuth({
+          credentials,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
 
-      return await auth.getClient();
+        return await auth.getClient();
+      } catch (decodeError) {
+        console.error('Failed to decode base64 credentials:', decodeError.message);
+        console.log('Trying JSON string fallback...');
+        // Fallback: try parsing as direct JSON
+        try {
+          const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_BASE64);
+          auth = new google.auth.GoogleAuth({
+            credentials,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+          });
+          return await auth.getClient();
+        } catch (jsonError) {
+          console.error('Failed to parse as JSON:', jsonError.message);
+          throw decodeError;
+        }
+      }
     }
 
     // Local: Try file path credentials
