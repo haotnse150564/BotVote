@@ -38,6 +38,8 @@ const OFFLINE_EMOJI_NAME = 'offline';
 const OFFLINE_EMOJI_ID = '1498552256226656297';
 const OFFLINE_EMOJI_MENTION = `<:${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}>`;
 const OFFLINE_EMOJI_REACT = `${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}`;
+const UPDATE_INFO_CHANNEL_ID = '1520705676521771089';
+const SCRIM_SIGNUP_CHANNEL_ID = '1508378901498302586';
 
 function getFormattedDateTime() {
   const now = new Date();
@@ -888,6 +890,24 @@ client.on(Events.MessageCreate, async (message) => {
       console.error('Failed to send bang chien message:', error.message);
       message.reply('❌ Lỗi khi gửi tin nhắn điểm danh bang chiến.');
     }
+    return;
+  }
+
+  if (content.toLowerCase().startsWith('nm!hi')) {
+    const taggedUser = message.mentions.users.first();
+
+    if (!taggedUser) {
+      message.reply('Format: `nm!hi @user`');
+      return;
+    }
+
+    message.channel.send(
+      `Xin chào bạn <@${taggedUser.id}> đến với Nhất Mộng:\n` +
+      `Bạn vui lòng update thông tin tại: <#${UPDATE_INFO_CHANNEL_ID}>\n` +
+      `Theo dõi thông tin đăng ký scrim bang tại: <#${SCRIM_SIGNUP_CHANNEL_ID}> .`
+    );
+
+    await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
   }
 
