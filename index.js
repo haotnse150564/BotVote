@@ -1053,7 +1053,7 @@ client.on(Events.MessageCreate, async (message) => {
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
     const moeEmbed = new EmbedBuilder()
-      .setImage('https://tenor.com/view/love-cute-mio-akiyama-anime-k-on-gif-24875957">Love');
+      .setImage('https://media1.tenor.com/m/y0Pa1lpLBXAAAAAd/love-cute.gif');
 
     await message.channel.send({
       content: `${tagText}✨ Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~~ 💓 💖 ✨ ✨`,
