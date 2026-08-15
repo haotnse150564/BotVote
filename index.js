@@ -41,6 +41,15 @@ const OFFLINE_EMOJI_REACT = `${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}`;
 const UPDATE_INFO_CHANNEL_ID = '1520705676521771089';
 const SCRIM_SIGNUP_CHANNEL_ID = '1508378901498302586';
 
+// Direct (hotlink-safe) gif URLs for nm!moe — picked at random each time
+const MOE_GIF_URLS = [
+  'https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif',
+  'https://media1.tenor.com/m/y0Pa1lpLBXAAAAAd/love-cute.gif',
+  'https://media1.tenor.com/m/jtiibdPsFx8AAAAd/moe-moe-kyun.gif',
+  'https://media1.tenor.com/m/zqldlCY9TjUAAAAd/u149-deresute.gif',
+  'https://media1.tenor.com/m/is3dNzRWE_gAAAAd/rabidredsalsa-denonbu.gif',
+];
+
 // Reminder settings — channel is env-overridable since it may change later
 const REMINDER_CHANNEL_ID = process.env.REMINDER_CHANNEL_ID || '1536936493321551923';
 
@@ -1049,8 +1058,10 @@ client.on(Events.MessageCreate, async (message) => {
     const taggedUser = message.mentions.users.first();
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
+    const randomGifUrl = MOE_GIF_URLS[Math.floor(Math.random() * MOE_GIF_URLS.length)];
+
     try {
-      const gifResponse = await fetch('https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif');
+      const gifResponse = await fetch(randomGifUrl);
       const gifBuffer = Buffer.from(await gifResponse.arrayBuffer());
       const gifAttachment = new AttachmentBuilder(gifBuffer, { name: 'moe.gif' });
 
