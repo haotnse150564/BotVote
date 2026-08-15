@@ -1045,8 +1045,13 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-  if (content.toLowerCase() === 'nm!moe') {
-    message.channel.send('Doki doki fuwa fuwa oshikunare moe moe kyun\nhttps://tenor.com/vi/view/anime-gif-26767553');
+  if (content.toLowerCase().startsWith('nm!moe')) {
+    const taggedUser = message.mentions.users.first();
+    const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
+
+    await message.channel.send(`${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun\nhttps://tenor.com/bYtCT.gif`);
+
+    await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
   }
 
