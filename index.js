@@ -1050,7 +1050,7 @@ client.on(Events.MessageCreate, async (message) => {
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
     const moeEmbed = new EmbedBuilder()
-      .setImage('https://tenor.com/bYtCT.gif');
+      .setImage('https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif');
 
     await message.channel.send({
       content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
