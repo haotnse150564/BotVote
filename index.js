@@ -1067,13 +1067,13 @@ client.on(Events.MessageCreate, async (message) => {
       const gifAttachment = new AttachmentBuilder(gifBuffer, { name: 'moe.gif' });
 
       const moeMessage = await message.channel.send({
-        content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
+        content: `${tagText}✨ Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~~ 💓 💖 ✨ ✨`,
         files: [gifAttachment],
       });
 
       setTimeout(() => {
         moeMessage.delete().catch(err => console.error('Failed to auto-delete moe message:', err.message));
-      }, 30 * 1000);
+      }, 10 * 1000);
     } catch (error) {
       console.error('Failed to send moe gif:', error.message);
       message.reply('❌ Lỗi khi gửi gif.');
