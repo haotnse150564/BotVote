@@ -754,6 +754,14 @@ async function sendReminderMessage(text) {
   }
 }
 
+function formatBcReminderMessage() {
+  return `<@&${SCRIM_PING_ROLE_ID}>\n# Đến giờ tập hợp bang chiến, mọi người online game để các lead pt dần nhé!:`;
+}
+
+function formatGcmnReminderMessage() {
+  return `<@&${SCRIM_PING_ROLE_ID}>\n# Hoạt động **Giải Cứu Mỹ Nhân** diễn ra sau 15phút nữa!!`;
+}
+
 function checkReminders() {
   const vnNow = getVnNow();
   const dayOfWeek = vnNow.getDay();
@@ -776,9 +784,7 @@ function checkReminders() {
     lastBcReminderDate !== todayKey
   ) {
     lastBcReminderDate = todayKey;
-    sendReminderMessage(
-      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ Còn ${BC_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Bang Chiến** (${String(BC_EVENT_HOUR).padStart(2, '0')}:${String(BC_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
-    );
+    sendReminderMessage(formatBcReminderMessage());
   }
 
   // Giải cứu mỹ nhân reminder — every other Tuesday, 15 minutes before 20:00
@@ -797,9 +803,7 @@ function checkReminders() {
     isGcmnOpeningWeek(vnNow)
   ) {
     lastGcmnReminderDate = todayKey;
-    sendReminderMessage(
-      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ Còn ${GCMN_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Giải Cứu Mỹ Nhân** (${String(GCMN_EVENT_HOUR).padStart(2, '0')}:${String(GCMN_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
-    );
+    sendReminderMessage(formatGcmnReminderMessage());
   }
 }
 
@@ -1027,9 +1031,7 @@ client.on(Events.MessageCreate, async (message) => {
       return;
     }
 
-    await sendReminderMessage(
-      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ [TEST] Còn ${BC_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Bang Chiến** (${String(BC_EVENT_HOUR).padStart(2, '0')}:${String(BC_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
-    );
+    await sendReminderMessage(formatBcReminderMessage());
     return;
   }
 
@@ -1039,9 +1041,12 @@ client.on(Events.MessageCreate, async (message) => {
       return;
     }
 
-    await sendReminderMessage(
-      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ [TEST] Còn ${GCMN_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Giải Cứu Mỹ Nhân** (${String(GCMN_EVENT_HOUR).padStart(2, '0')}:${String(GCMN_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
-    );
+    await sendReminderMessage(formatGcmnReminderMessage());
+    return;
+  }
+
+  if (content.toLowerCase() === 'nm!moe') {
+    message.channel.send('Doki doki fuwa fuwa oshikunare moe moe kyun\nhttps://tenor.com/vi/view/anime-gif-26767553');
     return;
   }
 
