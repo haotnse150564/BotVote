@@ -33,7 +33,10 @@ let bcData = {
 };
 
 const NPC_ROLE_ID = '1472421811055493142';
-const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331';
+
+//const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331'; //Role test
+const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1450590370194001941'; //Role Nhị Nhị
+
 const OFFLINE_EMOJI_NAME = 'offline';
 const OFFLINE_EMOJI_ID = '1498552256226656297';
 const OFFLINE_EMOJI_MENTION = `<:${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}>`;
@@ -1045,17 +1048,19 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-  if (content.toLowerCase().startsWith('nm!moe')) {
+if (content.toLowerCase().startsWith('nm!moe')) {
     const taggedUser = message.mentions.users.first();
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
     const moeEmbed = new EmbedBuilder()
-      .setImage('https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif');
+      .setColor('#FFC0CB') // Thêm màu cho Embed đẹp hơn (tùy chọn)
+      .setImage('https://i.imgur.com/vHqY75y.gif'); // Link GIF trực tiếp chạy ổn định
 
     await message.channel.send({
-      content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
+      content: `${tagText}Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~!`,
       embeds: [moeEmbed],
     });
+}
 
     await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
