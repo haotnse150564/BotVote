@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { Client, Events, GatewayIntentBits, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const { google } = require('googleapis');
 const http = require('http');
 
@@ -33,10 +33,7 @@ let bcData = {
 };
 
 const NPC_ROLE_ID = '1472421811055493142';
-
-//const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331'; //Role test
-const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1450590370194001941'; //Role Nhị Nhị
-
+const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331';
 const OFFLINE_EMOJI_NAME = 'offline';
 const OFFLINE_EMOJI_ID = '1498552256226656297';
 const OFFLINE_EMOJI_MENTION = `<:${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}>`;
@@ -1052,13 +1049,19 @@ client.on(Events.MessageCreate, async (message) => {
     const taggedUser = message.mentions.users.first();
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
-    const moeEmbed = new EmbedBuilder()
-      .setImage('https://media.tenor.com/24875957/love-cute.gif');
+    try {
+      const gifResponse = await fetch('https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif');
+      const gifBuffer = Buffer.from(await gifResponse.arrayBuffer());
+      const gifAttachment = new AttachmentBuilder(gifBuffer, { name: 'moe.gif' });
 
-    await message.channel.send({
-      content: `${tagText}✨ Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~~ 💓 💖 ✨ ✨`,
-      embeds: [moeEmbed],
-    });
+      await message.channel.send({
+        content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
+        files: [gifAttachment],
+      });
+    } catch (error) {
+      console.error('Failed to send moe gif:', error.message);
+      message.reply('❌ Lỗi khi gửi gif.');
+    }
 
     await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
