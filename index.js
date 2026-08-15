@@ -289,8 +289,8 @@ async function refreshResultSheet() {
     if (voteRows.length > 1) {
       for (let i = 1; i < voteRows.length; i += 1) {
         const row = voteRows[i];
-        const userId = row[4] ? String(row[4]).trim() : '';
-        const day = row[6] ? String(row[6]).trim() : '';
+        const userId = row[4] !== undefined && row[4] !== null ? String(row[4]).trim() : '';
+        const day = row[6] !== undefined && row[6] !== null ? String(row[6]).trim() : '';
 
         if (!userId || !day) continue;
 
@@ -567,8 +567,8 @@ async function removeVoteFromSheet(userId, day) {
 
     for (let i = 1; i < rows.length; i += 1) {
       const row = rows[i];
-      const rowUserId = row[4] ? String(row[4]).trim() : '';
-      const rowDay = row[6] ? String(row[6]).trim() : '';
+      const rowUserId = row[4] !== undefined && row[4] !== null ? String(row[4]).trim() : '';
+      const rowDay = row[6] !== undefined && row[6] !== null ? String(row[6]).trim() : '';
 
       if (rowUserId === String(userId).trim() && rowDay === String(day).trim()) {
         rowsToDelete.push(i + 1);
@@ -610,7 +610,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 
   const day = DAY_REACTIONS[reaction.emoji.name];
 
-  if (!day) {
+  if (day === undefined) {
     return;
   }
 
@@ -632,7 +632,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
 
   const day = DAY_REACTIONS[reaction.emoji.name];
 
-  if (!day) {
+  if (day === undefined) {
     return;
   }
 
