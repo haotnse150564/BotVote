@@ -405,12 +405,12 @@ function formatScrimMessage() {
   const rolePing = SCRIM_PING_ROLE_ID ? `<@&${SCRIM_PING_ROLE_ID}>\n\n` : '';
   return `${rolePing}# Thông báo Scrim Tuần Này
 
-## Buổi 1: Thứ 5 (Cố Định)
+## Buổi 1: Thứ 5 (Buổi 1 - Cố Định)
 Thời Gian: ${scrimData.session1Time}
 Đối Thủ: ${scrimData.session1Opponent}
 Số Trận: 2 Trận
 
-## Buổi 2: Thứ 4 / Thứ 6 (Buổi Phụ - Xem Chi Tiết Bên dưới, nếu update trễ sẽ có thông báo phụ)
+## Buổi 2: Thứ 4 / Thứ 6 (Buổi 2 - Xem Chi Tiết Bên dưới, nếu update trễ sẽ có thông báo phụ)
 Thời Gian: ${scrimData.session2Time}
 Đối Thủ: ${scrimData.session2Opponent}
 Số Trận: 2 Trận
