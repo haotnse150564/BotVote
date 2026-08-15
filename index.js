@@ -409,41 +409,46 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-  if (content.toLowerCase().startsWith('nm!scrim1')) {
+  if (content.toLowerCase().startsWith('nm!us1')) {
     // Kiểm tra role NPC
     if (!message.member.roles.cache.has(NPC_ROLE_ID)) {
       message.reply('❌ Bạn không có quyền sử dụng lệnh này. Cần role NPC.');
       return;
     }
 
-    const args = content.substring('nm!scrim1'.length).trim().split(';').map(arg => arg.trim()).filter(arg => arg);
-    if (args.length < 2) {
-      message.reply('Format: `nm!scrim1 <thời gian> ; <đối thủ>`\nVí dụ: `nm!scrim1 19:00 ; Server X`');
+    const rawArgs = content.substring('nm!us1'.length).trim();
+    const args = rawArgs.split(';').map(arg => arg.trim()).filter(arg => arg);
+
+    if (args.length === 0) {
+      message.reply('Format: `nm!us1 [thời gian] ; [đối thủ]`\nVí dụ:\n`nm!us1 19:00 ; Server X`\n`nm!us1 19:00`\n`nm!us1 ; Server X`');
       return;
     }
-    
-    scrimData.session1Time = args[0];
-    scrimData.session1Opponent = args[1];
+
+    if (args.length >= 1 && args[0]) {
+      scrimData.session1Time = args[0];
+    }
+
+    if (args.length >= 2 && args[1]) {
+      scrimData.session1Opponent = args[1];
+    }
+
     scrimData.updatedAt = getFormattedDateTime();
-    
+
     try {
-      // Nếu có tin nhắn scrim cũ, edit nó
       if (scrimData.messageId && scrimData.channelId) {
         const channel = await client.channels.fetch(scrimData.channelId);
         const scrimMessage = await channel.messages.fetch(scrimData.messageId);
         await scrimMessage.edit(formatScrimMessage());
       } else {
-        // Nếu không, gửi tin nhắn mới
         const scrimMessage = await message.channel.send(formatScrimMessage());
         scrimData.messageId = scrimMessage.id;
         scrimData.channelId = message.channelId;
-        
+
         for (const emoji of Object.keys(DAY_REACTIONS)) {
           await scrimMessage.react(emoji);
         }
       }
-      
-      // Xóa lệnh của người dùng
+
       await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     } catch (error) {
       console.error('Failed to update scrim message:', error.message);
@@ -452,41 +457,46 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-  if (content.toLowerCase().startsWith('nm!scrim2')) {
+  if (content.toLowerCase().startsWith('nm!us2')) {
     // Kiểm tra role NPC
     if (!message.member.roles.cache.has(NPC_ROLE_ID)) {
       message.reply('❌ Bạn không có quyền sử dụng lệnh này. Cần role NPC.');
       return;
     }
 
-    const args = content.substring('nm!scrim2'.length).trim().split(';').map(arg => arg.trim()).filter(arg => arg);
-    if (args.length < 2) {
-      message.reply('Format: `nm!scrim2 <thời gian> ; <đối thủ>`\nVí dụ: `nm!scrim2 21:00 ; Server Y`');
+    const rawArgs = content.substring('nm!us2'.length).trim();
+    const args = rawArgs.split(';').map(arg => arg.trim()).filter(arg => arg);
+
+    if (args.length === 0) {
+      message.reply('Format: `nm!us2 [thời gian] ; [đối thủ]`\nVí dụ:\n`nm!us2 21:00 ; Server Y`\n`nm!us2 21:00`\n`nm!us2 ; Server Y`');
       return;
     }
-    
-    scrimData.session2Time = args[0];
-    scrimData.session2Opponent = args[1];
+
+    if (args.length >= 1 && args[0]) {
+      scrimData.session2Time = args[0];
+    }
+
+    if (args.length >= 2 && args[1]) {
+      scrimData.session2Opponent = args[1];
+    }
+
     scrimData.updatedAt = getFormattedDateTime();
-    
+
     try {
-      // Nếu có tin nhắn scrim cũ, edit nó
       if (scrimData.messageId && scrimData.channelId) {
         const channel = await client.channels.fetch(scrimData.channelId);
         const scrimMessage = await channel.messages.fetch(scrimData.messageId);
         await scrimMessage.edit(formatScrimMessage());
       } else {
-        // Nếu không, gửi tin nhắn mới
         const scrimMessage = await message.channel.send(formatScrimMessage());
         scrimData.messageId = scrimMessage.id;
         scrimData.channelId = message.channelId;
-        
+
         for (const emoji of Object.keys(DAY_REACTIONS)) {
           await scrimMessage.react(emoji);
         }
       }
-      
-      // Xóa lệnh của người dùng
+
       await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     } catch (error) {
       console.error('Failed to update scrim message:', error.message);
