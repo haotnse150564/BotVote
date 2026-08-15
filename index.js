@@ -1048,19 +1048,17 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
-if (content.toLowerCase().startsWith('nm!moe')) {
+  if (content.toLowerCase().startsWith('nm!moe')) {
     const taggedUser = message.mentions.users.first();
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
     const moeEmbed = new EmbedBuilder()
-      .setColor('#FFC0CB') // Thêm màu cho Embed đẹp hơn (tùy chọn)
-      .setImage('https://i.imgur.com/vHqY75y.gif'); // Link GIF trực tiếp chạy ổn định
+      .setImage('https://media1.tenor.com/m/WgvfGvz013EAAAAC/anime.gif');
 
     await message.channel.send({
-      content: `${tagText}Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~!`,
+      content: `${tagText}Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~!!`,
       embeds: [moeEmbed],
     });
-}
 
     await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
