@@ -1066,7 +1066,7 @@ client.on(Events.MessageCreate, async (message) => {
       const gifAttachment = new AttachmentBuilder(gifBuffer, { name: 'moe.gif' });
 
       await message.channel.send({
-        content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
+        content: `${tagText}✨ Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~~ 💓 💖 ✨ ✨`,
         files: [gifAttachment],
       });
     } catch (error) {
