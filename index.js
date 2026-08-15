@@ -33,8 +33,7 @@ let bcData = {
 };
 
 const NPC_ROLE_ID = '1472421811055493142';
-// const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331'; //Role Test
-const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1450590370194001941'; //Role Nhị Nhộng
+const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331';
 const OFFLINE_EMOJI_NAME = 'offline';
 const OFFLINE_EMOJI_ID = '1498552256226656297';
 const OFFLINE_EMOJI_MENTION = `<:${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}>`;
@@ -406,16 +405,17 @@ function formatScrimMessage() {
   const rolePing = SCRIM_PING_ROLE_ID ? `<@&${SCRIM_PING_ROLE_ID}>\n\n` : '';
   return `${rolePing}# Thông báo Scrim Tuần Này
 
-## Buổi 1:
+## Buổi 1: Thứ 5 (Cố Định)
 Thời Gian: ${scrimData.session1Time}
 Đối Thủ: ${scrimData.session1Opponent}
 Số Trận: 2 Trận
 
-## Buổi 2:
+## Buổi 2: Thứ 4 / Thứ 6 (Buổi Phụ - Xem Chi Tiết Bên dưới, nếu update trễ sẽ có thông báo phụ)
 Thời Gian: ${scrimData.session2Time}
 Đối Thủ: ${scrimData.session2Opponent}
 Số Trận: 2 Trận
 
+*Vote trước thời gian đánh 1 ngày để xếp team*
 ---
 ${updateInfo}
 Chọn ngày phù hợp bằng các emoji bên dưới:
@@ -1066,10 +1066,14 @@ client.on(Events.MessageCreate, async (message) => {
       const gifBuffer = Buffer.from(await gifResponse.arrayBuffer());
       const gifAttachment = new AttachmentBuilder(gifBuffer, { name: 'moe.gif' });
 
-      await message.channel.send({
-        content: `${tagText}✨ Doki doki, Fuwa fuwa, Oshikunare, Moe moe, kyun~~~ 💓 💖 ✨ ✨`,
+      const moeMessage = await message.channel.send({
+        content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
         files: [gifAttachment],
       });
+
+      setTimeout(() => {
+        moeMessage.delete().catch(err => console.error('Failed to auto-delete moe message:', err.message));
+      }, 30 * 1000);
     } catch (error) {
       console.error('Failed to send moe gif:', error.message);
       message.reply('❌ Lỗi khi gửi gif.');
