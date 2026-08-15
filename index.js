@@ -41,6 +41,27 @@ const OFFLINE_EMOJI_REACT = `${OFFLINE_EMOJI_NAME}:${OFFLINE_EMOJI_ID}`;
 const UPDATE_INFO_CHANNEL_ID = '1520705676521771089';
 const SCRIM_SIGNUP_CHANNEL_ID = '1508378901498302586';
 
+// Reminder settings — channel is env-overridable since it may change later
+const REMINDER_CHANNEL_ID = process.env.REMINDER_CHANNEL_ID || '1536936493321551923';
+
+// Bang chiến: every Saturday 20:00 (UTC+7), reminder 30 minutes before -> 19:30
+const BC_EVENT_DAY = 6; // Saturday (0 = Sunday ... 6 = Saturday)
+const BC_EVENT_HOUR = 20;
+const BC_EVENT_MINUTE = 0;
+const BC_REMINDER_MINUTES_BEFORE = 30;
+
+// Giải cứu mỹ nhân: every other Tuesday 20:00 (UTC+7), reminder 15 minutes before -> 19:45
+// Reference date: 18/08/2026 is a confirmed opening Tuesday
+const GCMN_EVENT_DAY = 2; // Tuesday
+const GCMN_EVENT_HOUR = 20;
+const GCMN_EVENT_MINUTE = 0;
+const GCMN_REMINDER_MINUTES_BEFORE = 15;
+const GCMN_REFERENCE_DATE_UTC = Date.UTC(2026, 7, 18); // month is 0-indexed: 7 = August
+
+// Tracks the date (yyyy-mm-dd, VN time) each reminder was last sent, to avoid duplicate sends
+let lastBcReminderDate = null;
+let lastGcmnReminderDate = null;
+
 function getFormattedDateTime() {
   const now = new Date();
   const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -696,6 +717,92 @@ async function refreshBcMessage() {
   }
 }
 
+function getVnNow() {
+  const now = new Date();
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  return new Date(utcTime + (7 * 60 * 60 * 1000));
+}
+
+function getDateKey(vnDate) {
+  const y = vnDate.getFullYear();
+  const m = String(vnDate.getMonth() + 1).padStart(2, '0');
+  const d = String(vnDate.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function isGcmnOpeningWeek(vnDate) {
+  const dateOnlyUtc = Date.UTC(vnDate.getFullYear(), vnDate.getMonth(), vnDate.getDate());
+  const diffDays = Math.round((dateOnlyUtc - GCMN_REFERENCE_DATE_UTC) / (24 * 60 * 60 * 1000));
+  const diffWeeks = diffDays / 7;
+  const mod = ((diffWeeks % 2) + 2) % 2;
+  return mod === 0;
+}
+
+async function sendReminderMessage(text) {
+  if (!REMINDER_CHANNEL_ID) {
+    return;
+  }
+
+  try {
+    const channel = await client.channels.fetch(REMINDER_CHANNEL_ID);
+    await channel.send({
+      content: text,
+      allowedMentions: { roles: SCRIM_PING_ROLE_ID ? [SCRIM_PING_ROLE_ID] : [] },
+    });
+  } catch (error) {
+    console.error('Failed to send reminder message:', error.message);
+  }
+}
+
+function checkReminders() {
+  const vnNow = getVnNow();
+  const dayOfWeek = vnNow.getDay();
+  const hours = vnNow.getHours();
+  const minutes = vnNow.getMinutes();
+  const todayKey = getDateKey(vnNow);
+
+  // Bang chiến reminder — every Saturday, 30 minutes before 20:00
+  let bcReminderMinuteMark = BC_EVENT_MINUTE - BC_REMINDER_MINUTES_BEFORE;
+  let bcReminderHour = BC_EVENT_HOUR;
+  if (bcReminderMinuteMark < 0) {
+    bcReminderMinuteMark += 60;
+    bcReminderHour -= 1;
+  }
+
+  if (
+    dayOfWeek === BC_EVENT_DAY &&
+    hours === bcReminderHour &&
+    minutes === bcReminderMinuteMark &&
+    lastBcReminderDate !== todayKey
+  ) {
+    lastBcReminderDate = todayKey;
+    sendReminderMessage(
+      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ Còn ${BC_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Bang Chiến** (${String(BC_EVENT_HOUR).padStart(2, '0')}:${String(BC_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
+    );
+  }
+
+  // Giải cứu mỹ nhân reminder — every other Tuesday, 15 minutes before 20:00
+  let gcmnReminderMinuteMark = GCMN_EVENT_MINUTE - GCMN_REMINDER_MINUTES_BEFORE;
+  let gcmnReminderHour = GCMN_EVENT_HOUR;
+  if (gcmnReminderMinuteMark < 0) {
+    gcmnReminderMinuteMark += 60;
+    gcmnReminderHour -= 1;
+  }
+
+  if (
+    dayOfWeek === GCMN_EVENT_DAY &&
+    hours === gcmnReminderHour &&
+    minutes === gcmnReminderMinuteMark &&
+    lastGcmnReminderDate !== todayKey &&
+    isGcmnOpeningWeek(vnNow)
+  ) {
+    lastGcmnReminderDate = todayKey;
+    sendReminderMessage(
+      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ Còn ${GCMN_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Giải Cứu Mỹ Nhân** (${String(GCMN_EVENT_HOUR).padStart(2, '0')}:${String(GCMN_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
+    );
+  }
+}
+
 client.once(Events.ClientReady, async (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}`);
   const authClient = await getGoogleAuthClient();
@@ -703,6 +810,9 @@ client.once(Events.ClientReady, async (readyClient) => {
     await ensureResultSheet(authClient);
     console.log(`Ensured ${RESULT_SHEET_NAME} sheet exists.`);
   }
+
+  setInterval(checkReminders, 60 * 1000);
+  console.log('Started reminder scheduler (checks every minute).');
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -908,6 +1018,30 @@ client.on(Events.MessageCreate, async (message) => {
     );
 
     await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
+    return;
+  }
+
+  if (content.toLowerCase() === 'nm!testbc') {
+    if (!message.member.roles.cache.has(NPC_ROLE_ID)) {
+      message.reply('❌ Bạn không có quyền sử dụng lệnh này. Cần role NPC.');
+      return;
+    }
+
+    await sendReminderMessage(
+      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ [TEST] Còn ${BC_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Bang Chiến** (${String(BC_EVENT_HOUR).padStart(2, '0')}:${String(BC_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
+    );
+    return;
+  }
+
+  if (content.toLowerCase() === 'nm!testgcmn') {
+    if (!message.member.roles.cache.has(NPC_ROLE_ID)) {
+      message.reply('❌ Bạn không có quyền sử dụng lệnh này. Cần role NPC.');
+      return;
+    }
+
+    await sendReminderMessage(
+      `<@&${SCRIM_PING_ROLE_ID}>\n\n⏰ [TEST] Còn ${GCMN_REMINDER_MINUTES_BEFORE} phút nữa là đến giờ **Giải Cứu Mỹ Nhân** (${String(GCMN_EVENT_HOUR).padStart(2, '0')}:${String(GCMN_EVENT_MINUTE).padStart(2, '0')})!\nMọi người chuẩn bị sẵn sàng nhé.`
+    );
     return;
   }
 
