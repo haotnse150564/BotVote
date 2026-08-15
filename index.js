@@ -26,7 +26,7 @@ let scrimData = {
 };
 
 const NPC_ROLE_ID = '1472421811055493142';
-const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1538026034287476766';
+const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1528993894052659331';
 
 function getFormattedDateTime() {
   const now = new Date();
