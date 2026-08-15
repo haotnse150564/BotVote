@@ -29,12 +29,15 @@ const NPC_ROLE_ID = '1472421811055493142';
 
 function getFormattedDateTime() {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
+  const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const utcPlus7 = new Date(utcTime + (7 * 60 * 60 * 1000));
+
+  const hours = String(utcPlus7.getHours()).padStart(2, '0');
+  const minutes = String(utcPlus7.getMinutes()).padStart(2, '0');
+  const seconds = String(utcPlus7.getSeconds()).padStart(2, '0');
+  const day = String(utcPlus7.getDate()).padStart(2, '0');
+  const month = String(utcPlus7.getMonth() + 1).padStart(2, '0');
+  const year = utcPlus7.getFullYear();
   return `${hours}:${minutes}:${seconds}, ngày ${day}/${month}/${year}`;
 }
 
@@ -265,7 +268,7 @@ async function refreshResultSheet() {
 
     const dsbResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${DSB_SHEET_NAME}!A:C`,
+      range: `${DSB_SHEET_NAME}!A:D`,
     });
 
     const dsbRows = dsbResponse.data.values || [];
@@ -311,7 +314,9 @@ async function refreshResultSheet() {
       const row = dsbRows[i];
       const id = (idIndex >= 0 && row[idIndex]) ? String(row[idIndex]).trim() : (row[0] ? String(row[0]).trim() : '');
       const ingame = (ingameIndex >= 0 && row[ingameIndex]) ? String(row[ingameIndex]).trim() : (row[1] ? String(row[1]).trim() : '');
-      const className = (classIndex >= 0 && row[classIndex]) ? String(row[classIndex]).trim() : (row[2] ? String(row[2]).trim() : '');
+      const className = (classIndex >= 0 && row[classIndex])
+        ? String(row[classIndex]).trim()
+        : ((row[3] !== undefined && row[3] !== null) ? String(row[3]).trim() : (row[2] ? String(row[2]).trim() : ''));
 
       if (!id) continue;
 
