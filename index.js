@@ -26,6 +26,7 @@ let scrimData = {
 };
 
 const NPC_ROLE_ID = '1472421811055493142';
+const SCRIM_PING_ROLE_ID = process.env.SCRIM_PING_ROLE_ID || '1538026034287476766';
 
 function getFormattedDateTime() {
   const now = new Date();
@@ -358,7 +359,8 @@ async function refreshResultSheet() {
 
 function formatScrimMessage() {
   const updateInfo = scrimData.updatedAt ? `Đã Cập Nhật Lúc: ${scrimData.updatedAt}` : '';
-  return `# Thông báo Scrim Tuần Này
+  const rolePing = SCRIM_PING_ROLE_ID ? `<@&${SCRIM_PING_ROLE_ID}>\n\n` : '';
+  return `${rolePing}# Thông báo Scrim Tuần Này
 
 ## Buổi 1:
 Thời Gian: ${scrimData.session1Time}
@@ -396,7 +398,10 @@ client.on(Events.MessageCreate, async (message) => {
   if (content.toLowerCase() === 'nm!vote') {
     await resetVoteSheet();
 
-    const voteMessage = await message.channel.send(formatScrimMessage());
+    const voteMessage = await message.channel.send({
+      content: formatScrimMessage(),
+      allowedMentions: { roles: SCRIM_PING_ROLE_ID ? [SCRIM_PING_ROLE_ID] : [] }, // ping on creation
+    });
     
     // Lưu messageId để có thể edit sau
     scrimData.messageId = voteMessage.id;
@@ -438,9 +443,15 @@ client.on(Events.MessageCreate, async (message) => {
       if (scrimData.messageId && scrimData.channelId) {
         const channel = await client.channels.fetch(scrimData.channelId);
         const scrimMessage = await channel.messages.fetch(scrimData.messageId);
-        await scrimMessage.edit(formatScrimMessage());
+        await scrimMessage.edit({
+          content: formatScrimMessage(),
+          allowedMentions: { roles: [] }, // don't re-ping on edit
+        });
       } else {
-        const scrimMessage = await message.channel.send(formatScrimMessage());
+        const scrimMessage = await message.channel.send({
+          content: formatScrimMessage(),
+          allowedMentions: { roles: [] }, // no ping (only nm!vote pings)
+        });
         scrimData.messageId = scrimMessage.id;
         scrimData.channelId = message.channelId;
 
@@ -486,9 +497,15 @@ client.on(Events.MessageCreate, async (message) => {
       if (scrimData.messageId && scrimData.channelId) {
         const channel = await client.channels.fetch(scrimData.channelId);
         const scrimMessage = await channel.messages.fetch(scrimData.messageId);
-        await scrimMessage.edit(formatScrimMessage());
+        await scrimMessage.edit({
+          content: formatScrimMessage(),
+          allowedMentions: { roles: [] }, // don't re-ping on edit
+        });
       } else {
-        const scrimMessage = await message.channel.send(formatScrimMessage());
+        const scrimMessage = await message.channel.send({
+          content: formatScrimMessage(),
+          allowedMentions: { roles: [] }, // no ping (only nm!vote pings)
+        });
         scrimData.messageId = scrimMessage.id;
         scrimData.channelId = message.channelId;
 
@@ -524,7 +541,10 @@ client.on(Events.MessageCreate, async (message) => {
       if (scrimData.messageId && scrimData.channelId) {
         const channel = await client.channels.fetch(scrimData.channelId);
         const scrimMessage = await channel.messages.fetch(scrimData.messageId);
-        await scrimMessage.edit(formatScrimMessage());
+        await scrimMessage.edit({
+          content: formatScrimMessage(),
+          allowedMentions: { roles: [] }, // don't re-ping on edit
+        });
       }
 
       // Xóa lệnh của người dùng
