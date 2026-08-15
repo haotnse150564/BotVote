@@ -422,14 +422,15 @@ client.on(Events.MessageCreate, async (message) => {
     }
 
     const rawArgs = content.substring('nm!us1'.length).trim();
-    const args = rawArgs.split(';').map(arg => arg.trim()).filter(arg => arg);
 
-    if (args.length === 0) {
+    if (!rawArgs) {
       message.reply('Format: `nm!us1 [thời gian] ; [đối thủ]`\nVí dụ:\n`nm!us1 19:00 ; Server X`\n`nm!us1 19:00`\n`nm!us1 ; Server X`');
       return;
     }
 
-    if (args.length >= 1 && args[0]) {
+    const args = rawArgs.split(';').map(arg => arg.trim());
+
+    if (args[0]) {
       scrimData.session1Time = args[0];
     }
 
@@ -476,14 +477,15 @@ client.on(Events.MessageCreate, async (message) => {
     }
 
     const rawArgs = content.substring('nm!us2'.length).trim();
-    const args = rawArgs.split(';').map(arg => arg.trim()).filter(arg => arg);
 
-    if (args.length === 0) {
+    if (!rawArgs) {
       message.reply('Format: `nm!us2 [thời gian] ; [đối thủ]`\nVí dụ:\n`nm!us2 21:00 ; Server Y`\n`nm!us2 21:00`\n`nm!us2 ; Server Y`');
       return;
     }
 
-    if (args.length >= 1 && args[0]) {
+    const args = rawArgs.split(';').map(arg => arg.trim());
+
+    if (args[0]) {
       scrimData.session2Time = args[0];
     }
 
