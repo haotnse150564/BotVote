@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const { google } = require('googleapis');
 const http = require('http');
 
@@ -1049,7 +1049,13 @@ client.on(Events.MessageCreate, async (message) => {
     const taggedUser = message.mentions.users.first();
     const tagText = taggedUser ? `<@${taggedUser.id}> ` : '';
 
-    await message.channel.send(`${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun\nhttps://tenor.com/bYtCT.gif`);
+    const moeEmbed = new EmbedBuilder()
+      .setImage('https://tenor.com/bYtCT.gif');
+
+    await message.channel.send({
+      content: `${tagText}Doki doki fuwa fuwa oshikunare moe moe kyun`,
+      embeds: [moeEmbed],
+    });
 
     await message.delete().catch(err => console.error('Failed to delete command message:', err.message));
     return;
